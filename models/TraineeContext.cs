@@ -1,13 +1,13 @@
-using Microsoft.EntityFrameworkCore;
+// using Microsoft.EntityFrameworkCore;
 
-namespace TraineeManagement.Models;
+// namespace TraineeManagement.Models;
 
-public class TraineeContext : DbContext
-{
-    public TraineeContext(DbContextOptions<TraineeContext> options)
-        : base(options)
-    {
-    }
+// public class TraineeContext : DbContext
+// {
+//     public TraineeContext(DbContextOptions<TraineeContext> options)
+//         : base(options)
+//     {
+//     }
 
-    public DbSet<Trainee> TodoItems { get; set; } = null!;
-}
+//     public DbSet<Trainee> TodoItems { get; set; } = null!;
+// }

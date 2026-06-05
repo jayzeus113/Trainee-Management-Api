@@ -7,19 +7,20 @@ public class CreateTraineeRequest
 {
     [Required]
     [MaxLength(50)]
-    public string FirstName {get; set;}
+    public string FirstName {get; set;} = string.Empty;
 
     [Required]
     [MaxLength(50)]
-    public string LastName {get; set;}
+    public string LastName {get; set;} = string.Empty;
 
     [Required]
     [EmailAddress]
-    public string Email {get; set;}
+    public string Email {get; set;} = string.Empty;
 
     [Required]
-    public string TechStack {get; set;}
+    public string TechStack {get; set;} = string.Empty;
     
     [Required]
-    public string Status {get; set;}
+    [AllowedValues(["Active", "Inactive", "Completed"], ErrorMessage="Invalid status value")]
+    public string Status {get; set;} = string.Empty;
 }
