@@ -4,7 +4,7 @@ namespace TraineeManagement.Models;
 
 public class Trainee
 {
-    private static int UID = 0;
+    private static int UID = 1;
     public int Id { get; set; }
     public string FirstName { get; set; } = "";
     public string LastName { get; set; } = "";
@@ -24,6 +24,8 @@ public class Trainee
         Status=createTraineeRequest.Status;
         CreatedDate=DateTime.UtcNow;
         UpdatedDate=DateTime.UtcNow;
-        UID++;
+        UID = UID + 1;
     }
+
+    Trainee(){ }
 }

@@ -19,41 +19,39 @@ public class TraineeController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] string? search)
     {
-        var response = _traineeService.GetAll();
+        IEnumerable<TraineeResponse> response = await  _traineeService.GetAll(search);
         return Ok(response);
     }
 
     [HttpGet("{Id:int}")]
-    public IActionResult GetById(int Id)
+    public async Task<IActionResult> GetById(int Id)
     {
-        var response = _traineeService.GetById(Id);
+        TraineeResponse? response = await _traineeService.GetById(Id);
         if(response == null) return NotFound();
         return Ok(response);
     }
 
     [HttpPost]
-    public IActionResult Create(CreateTraineeRequest createTraineeRequest)
+    public async Task<IActionResult> Create(CreateTraineeRequest createTraineeRequest)
     {
-        TraineeResponse response = _traineeService.Create(createTraineeRequest);
+        TraineeResponse response = await _traineeService.Create(createTraineeRequest);
         return Created("api/Trainee", response);
     }
 
     [HttpPut("{Id:int}")]
-    public IActionResult Update(int Id, UpdateTraineeRequest updateTraineeRequest)
+    public async Task<IActionResult> Update(int Id, UpdateTraineeRequest updateTraineeRequest)
     {
-        TraineeResponse ? traineeResponse = _traineeService.Update(Id, updateTraineeRequest);
+        TraineeResponse? traineeResponse = await _traineeService.Update(Id, updateTraineeRequest);
         return traineeResponse == null ? NotFound() : Ok(traineeResponse);
     }
 
     [HttpDelete("{Id:int}")]
 
-    public IActionResult Delete(int Id)
+    public async Task<IActionResult> Delete(int Id)
     {
-        bool res = _traineeService.Delete(Id);
+        bool res = await _traineeService.Delete(Id);
         return res ? NoContent() : NotFound();
     }
-
-
 }

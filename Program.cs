@@ -1,18 +1,23 @@
 using Microsoft.EntityFrameworkCore;
+using TraineeManagement.Data;
 using TraineeManagement.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    options.UseInMemoryDatabase("TraineeManagementDb");
+});
+
 builder.Services.AddOpenApi();
 builder.Services.AddScoped<ITraineeService, TraineeService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();

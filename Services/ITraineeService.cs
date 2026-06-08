@@ -1,17 +1,15 @@
 using TraineeManagement.DTOs;
-using TraineeManagement.Models;
-using Microsoft.AspNetCore.Mvc;
 
 namespace TraineeManagement.Services
 {
     public interface ITraineeService
     {
-        IEnumerable<TraineeResponse> GetAll();
-        TraineeResponse? GetById(int id);
-        TraineeResponse Create(CreateTraineeRequest createTraineeRequest);
+        Task<IEnumerable<TraineeResponse>> GetAll(string? search);
+        Task<TraineeResponse?> GetById(int Id);
+        Task<TraineeResponse> Create(CreateTraineeRequest createTraineeRequest);
 
-        TraineeResponse? Update(int id, UpdateTraineeRequest updateTraineeRequest);
+        Task<TraineeResponse?> Update(int Id, UpdateTraineeRequest updateTraineeRequest);
 
-        bool Delete(int id);
+        Task<bool> Delete(int Id);
     }
 }
