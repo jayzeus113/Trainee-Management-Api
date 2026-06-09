@@ -53,7 +53,9 @@ namespace TraineeManagement.Services
             trainee.Email = updateTraineeRequest.Email;
             trainee.TechStack = updateTraineeRequest.TechStack;
             trainee.Status = updateTraineeRequest.Status;
-            trainee.UpdatedDate = DateTime.UtcNow;
+            DateTime dt = DateTime.Now;
+            DateTime date = new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second);
+            trainee.UpdatedDate = date;
             await _context.SaveChangesAsync();
             return new TraineeResponse(trainee);
         }

@@ -13,6 +13,22 @@
 ### Navigate to Project directory
 `cd Trainee-Management-Api`
 
+  ---
+### Database Setup Steps
+
+#### Modify Connection string in appsettings.json
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": 
+    "server=localhost;port=3306;database=trainee_management_db;user=root;password=root;"
+  }
+}
+```
+
+#### Apply migration to the database
+`dotnet ef database update`
+
 ### Run Application
 dotnet run
 
@@ -230,6 +246,3 @@ curl -X 'DELETE' \
   'https://localhost:7148/api/Trainee/1' \
   -H 'accept: */*'
 ```
-
-## Limitations
-- In memory Db (No persistent)

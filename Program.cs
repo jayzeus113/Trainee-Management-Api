@@ -7,10 +7,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseInMemoryDatabase("TraineeManagementDb");
+    // options.UseInMemoryDatabase("TraineeManagementDb");
+    options.UseMySQL(connectionString);
 });
 
 builder.Services.AddOpenApi();

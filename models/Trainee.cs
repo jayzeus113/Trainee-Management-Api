@@ -4,7 +4,6 @@ namespace TraineeManagement.Models;
 
 public class Trainee
 {
-    private static int UID = 1;
     public int Id { get; set; }
     public string FirstName { get; set; } = "";
     public string LastName { get; set; } = "";
@@ -16,15 +15,15 @@ public class Trainee
 
     public Trainee(CreateTraineeRequest createTraineeRequest)
     {
-        Id=UID;
         FirstName=createTraineeRequest.FirstName;
         LastName=createTraineeRequest.LastName;
         Email=createTraineeRequest.Email;
         TechStack=createTraineeRequest.TechStack;
         Status=createTraineeRequest.Status;
-        CreatedDate=DateTime.UtcNow;
-        UpdatedDate=DateTime.UtcNow;
-        UID = UID + 1;
+        DateTime dt = DateTime.Now;
+        DateTime date = new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second);
+        CreatedDate = date;
+        UpdatedDate = date;
     }
 
     Trainee(){ }
