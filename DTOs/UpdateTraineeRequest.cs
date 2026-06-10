@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 
 namespace TraineeManagement.DTOs;
-
 public class UpdateTraineeRequest
 {
     [Required]
