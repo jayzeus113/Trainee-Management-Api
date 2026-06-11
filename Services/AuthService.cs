@@ -15,19 +15,30 @@ public class AuthService : IAuthService
 
     private readonly JwtService _jwtService;
 
-    public AuthService(AppDbContext context, JwtService jwtService)
+    private readonly ILogger<TraineeService> _logger;
+
+    public AuthService(AppDbContext context, JwtService jwtService, ILogger<TraineeService> logger)
     {
         _context = context;
         _jwtService = jwtService;
+        _logger = logger;
     }
 
     public async Task<LoginResponse?> Login(LoginRequest loginRequest)
     {
         User? user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == loginRequest.UserName);
-        if(user == null) return null;
+        if(user == null)
+        {
+            _logger.LogWarning("Record not found. Resource: {ResourceType}, Username: {Identifier}", "Trainee", loginRequest.UserName);
+            return null;
+        }
 
-        bool res = PasswordHasherService.VerifyPassword(loginRequest.Password, user.PasswordHash);
-        if(!res) return null;
+        bool isValidPassword = PasswordHasherService.VerifyPassword(loginRequest.Password, user.PasswordHash);
+        if(!isValidPassword)
+        {
+            _logger.LogWarning("Password is Incorrect. Resource: {ResourceType}, Username: {Identifier}", "Trainee", loginRequest.UserName);
+            return null;
+        }
 
         var token = _jwtService.GenerateToken(user.Id, user.UserName, user.Role);
 

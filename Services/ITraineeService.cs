@@ -1,10 +1,11 @@
 using TraineeManagement.DTOs;
+using TraineeManagement.Models;
 
 namespace TraineeManagement.Services
 {
     public interface ITraineeService
     {
-        Task<IEnumerable<TraineeResponse>> GetAll(string? search);
+        Task<PagedResponse<TraineeResponse>>  GetAll(TraineeSearchParameters traineeSearchParameters);
         Task<TraineeResponse?> GetById(int Id);
         Task<TraineeResponse> Create(CreateTraineeRequest createTraineeRequest);
 

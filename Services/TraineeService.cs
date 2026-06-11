@@ -2,20 +2,26 @@ using TraineeManagement.Models;
 using TraineeManagement.DTOs;
 using TraineeManagement.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TraineeManagement.Services;
 public class TraineeService : ITraineeService
 {
     private readonly AppDbContext _context;
+    private readonly ILogger<TraineeService> _logger;
 
-    public TraineeService(AppDbContext context)
+    public TraineeService(AppDbContext context, ILogger<TraineeService> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
-    public async Task<IEnumerable<TraineeResponse>> GetAll(string? search)
+    public async Task<PagedResponse<TraineeResponse>> GetAll(TraineeSearchParameters traineeSearchParameters)
     {
         IQueryable<Trainee> query = _context.Trainees.AsQueryable();
+        string search = traineeSearchParameters.Search!;
+        string status = traineeSearchParameters.Status!;
+
         if(!string.IsNullOrWhiteSpace(search))
         {
             search = search.ToLower();
@@ -26,12 +32,27 @@ public class TraineeService : ITraineeService
             );
         }
 
-        return await query.Select(t => new TraineeResponse(t)).ToListAsync();
+        if(!string.IsNullOrWhiteSpace(status))
+            query = query.Where(t => t.Status == status);
+
+        int totalRecords = await query.CountAsync();
+
+        List<TraineeResponse> pagedData = await query.Skip((traineeSearchParameters.PageNumber - 1) * traineeSearchParameters.PageSize)
+        .Take(traineeSearchParameters.PageSize)
+        .Select(t => new TraineeResponse(t))
+        .ToListAsync();
+        
+
+        return new PagedResponse<TraineeResponse>(pagedData, totalRecords, traineeSearchParameters.PageNumber, traineeSearchParameters.PageSize);
     }
     public async Task<TraineeResponse?> GetById(int Id)
     {
         Trainee? trainee = await _context.Trainees.FindAsync(Id);
-        if(trainee == null) return null;
+        if(trainee == null)
+        {
+            _logger.LogWarning("Record not found. Resource: {ResourceType}, Identifier: {Identifier}", "Trainee", Id);
+            return null;
+        }
         return new TraineeResponse(trainee);
     }
 
@@ -40,13 +61,18 @@ public class TraineeService : ITraineeService
         Trainee trainee = new Trainee(createTraineeRequest);
         await _context.Trainees.AddAsync(trainee);
         await _context.SaveChangesAsync();
+        _logger.LogInformation("Trainee event: {ActionEvent} occured for {TraineeId}", "Created", trainee.Id);
         return new TraineeResponse(trainee);
     }
 
     public async Task<TraineeResponse?> Update(int Id, UpdateTraineeRequest updateTraineeRequest)
     {
         Trainee? trainee = await _context.Trainees.FindAsync(Id);
-        if(trainee == null) return null;
+        if(trainee == null)
+        {
+            _logger.LogWarning("Record not found. Resource: {ResourceType}, Identifier: {Identifier}", "Trainee", Id);
+            return null;
+        }
         trainee.FirstName = updateTraineeRequest.FirstName;
         trainee.LastName = updateTraineeRequest.LastName;
         trainee.Email = updateTraineeRequest.Email;
@@ -56,15 +82,21 @@ public class TraineeService : ITraineeService
         DateTime date = new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second);
         trainee.UpdatedDate = date;
         await _context.SaveChangesAsync();
+        _logger.LogInformation("Trainee event: {ActionEvent} occurred for TraineeId: {TraineeId}", "Updated", trainee.Id);
         return new TraineeResponse(trainee);
     }
 
     public async Task<bool> Delete(int Id)
     {
         Trainee? trainee = await _context.Trainees.FindAsync(Id);
-        if(trainee == null) return false;
+        if(trainee == null)
+        {
+            _logger.LogWarning("Record not found. Resource: {ResourceType}, Identifier: {Identifier}", "Trainee", Id);
+            return false;
+        }
         _context.Trainees.Remove(trainee);
         await _context.SaveChangesAsync();
+        _logger.LogInformation("Trainee event: {ActionEvent} occurred for TraineeId: {TraineeId}", "Updated", Id);
         return true;
     }
 }

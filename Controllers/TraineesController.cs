@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using TraineeManagement.Models;
 using TraineeManagement.DTOs;
 using TraineeManagement.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -7,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace
 TraineeManagement.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class TraineeController : ControllerBase
@@ -20,9 +20,9 @@ public class TraineeController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] string? search)
+    public async Task<IActionResult> GetAll([FromQuery] TraineeSearchParameters traineeSearchParameters)
     {
-        IEnumerable<TraineeResponse> response = await  _traineeService.GetAll(search);
+        PagedResponse<TraineeResponse> response = await  _traineeService.GetAll(traineeSearchParameters);
         return Ok(response);
     }
 
