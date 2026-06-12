@@ -8,7 +8,7 @@ TraineeManagement.Controllers;
 
 [Authorize]
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/trainees")]
 public class TraineeController : ControllerBase
 {
 

@@ -11,10 +11,9 @@ using Microsoft.OpenApi;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITraineeService, TraineeService>();
+builder.Services.AddScoped<IMentorService, MentorService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-
-
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
 ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -38,6 +37,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(secretKey)
         };
     });
+
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddAuthorization();
 
