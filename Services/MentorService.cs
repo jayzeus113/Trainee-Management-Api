@@ -15,11 +15,11 @@ public class MentorService : IMentorService
         _logger = logger;
     }
 
-    public async Task<PagedResponse<MentorResponse>> GetAll(MentorSearchParameters MentorSearchParameters)
+    public async Task<PagedResponse<MentorResponse>> GetAll(MentorSearchParameters mentorSearchParameters)
     {
         IQueryable<Mentor> query = _context.Mentors.AsQueryable();
-        string search = MentorSearchParameters.Search!;
-        string status = MentorSearchParameters.Status!;
+        string search = mentorSearchParameters.Search!;
+        string status = mentorSearchParameters.Status!;
 
         if(!string.IsNullOrWhiteSpace(search))
         {
@@ -36,13 +36,13 @@ public class MentorService : IMentorService
 
         int totalRecords = await query.CountAsync();
 
-        List<MentorResponse> pagedData = await query.Skip((MentorSearchParameters.PageNumber - 1) * MentorSearchParameters.PageSize)
-        .Take(MentorSearchParameters.PageSize)
+        List<MentorResponse> pagedData = await query.Skip((mentorSearchParameters.PageNumber - 1) * mentorSearchParameters.PageSize)
+        .Take(mentorSearchParameters.PageSize)
         .Select(t => new MentorResponse(t))
         .ToListAsync();
         
 
-        return new PagedResponse<MentorResponse>(pagedData, totalRecords, MentorSearchParameters.PageNumber, MentorSearchParameters.PageSize);
+        return new PagedResponse<MentorResponse>(pagedData, totalRecords, mentorSearchParameters.PageNumber, mentorSearchParameters.PageSize);
     }
     public async Task<MentorResponse?> GetById(int Id)
     {

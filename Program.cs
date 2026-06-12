@@ -12,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITraineeService, TraineeService>();
 builder.Services.AddScoped<IMentorService, MentorService>();
+builder.Services.AddScoped<ILearningTaskService, LearningTaskService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 

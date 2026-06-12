@@ -15,4 +15,5 @@ public class AppDbContext : DbContext
     public DbSet<User> Users { get; set; } = null!;
 
     public DbSet<Mentor> Mentors {get; set;} = null!;
+    public DbSet<LearningTask> LearningTasks {get; set;} = null!;
 }

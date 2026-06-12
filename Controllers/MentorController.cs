@@ -44,8 +44,8 @@ public class MentorController : ControllerBase
     [HttpPut("{Id:int}")]
     public async Task<IActionResult> Update(int Id, UpdateMentorRequest updateMentorRequest)
     {
-        MentorResponse? MentorResponse = await _mentorService.Update(Id, updateMentorRequest);
-        return MentorResponse == null ? NotFound() : Ok(MentorResponse);
+        MentorResponse? mentorResponse = await _mentorService.Update(Id, updateMentorRequest);
+        return mentorResponse == null ? NotFound() : Ok(mentorResponse);
     }
 
     [HttpDelete("{Id:int}")]
