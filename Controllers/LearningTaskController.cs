@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using TraineeManagement.Services;
 using TraineeManagement.DTOs;
+using Microsoft.AspNetCore.Authorization;
 namespace TraineeManagement.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("/api/learning-tasks")]
 
