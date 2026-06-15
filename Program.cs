@@ -9,10 +9,19 @@ using Microsoft.OpenApi;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITraineeService, TraineeService>();
 builder.Services.AddScoped<IMentorService, MentorService>();
 builder.Services.AddScoped<ILearningTaskService, LearningTaskService>();
+builder.Services.AddScoped<ITaskAssignmentService, TaskAssignmentService>();
+builder.Services.AddScoped<ISubmissionService, SubmissionService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
@@ -78,6 +87,7 @@ builder.Logging.AddConsole();
  
 
 var app = builder.Build();
+app.UseExceptionHandler(); 
 
 if (app.Environment.IsDevelopment())
 {

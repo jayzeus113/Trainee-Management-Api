@@ -3,6 +3,7 @@ using TraineeManagement.DTOs;
 using TraineeManagement.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using TraineeManagement.Exceptions;
 
 namespace TraineeManagement.Services;
 public class TraineeService : ITraineeService
@@ -45,13 +46,13 @@ public class TraineeService : ITraineeService
 
         return new PagedResponse<TraineeResponse>(pagedData, totalRecords, traineeSearchParameters.PageNumber, traineeSearchParameters.PageSize);
     }
-    public async Task<TraineeResponse?> GetById(int Id)
+    public async Task<TraineeResponse> GetById(int Id)
     {
         Trainee? trainee = await _context.Trainees.FindAsync(Id);
         if(trainee == null)
         {
             _logger.LogWarning("Record not found. Resource: {ResourceType}, Identifier: {Identifier}", "Trainee", Id);
-            return null;
+            throw new NotFoundException($"Trainee not found with Id: {Id}");
         }
         return new TraineeResponse(trainee);
     }
@@ -65,13 +66,13 @@ public class TraineeService : ITraineeService
         return new TraineeResponse(trainee);
     }
 
-    public async Task<TraineeResponse?> Update(int Id, UpdateTraineeRequest updateTraineeRequest)
+    public async Task<TraineeResponse> Update(int Id, UpdateTraineeRequest updateTraineeRequest)
     {
         Trainee? trainee = await _context.Trainees.FindAsync(Id);
         if(trainee == null)
         {
             _logger.LogWarning("Record not found. Resource: {ResourceType}, Identifier: {Identifier}", "Trainee", Id);
-            return null;
+            throw new NotFoundException($"Trainee not found with Id: {Id}");
         }
         trainee.FirstName = updateTraineeRequest.FirstName;
         trainee.LastName = updateTraineeRequest.LastName;

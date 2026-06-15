@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TraineeManagement.Data;
 
@@ -10,9 +11,11 @@ using TraineeManagement.Data;
 namespace TraineeManagement.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260615073519_addTaskAssignments")]
+    partial class addTaskAssignments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -90,66 +93,6 @@ namespace TraineeManagement.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Mentors");
-                });
-
-            modelBuilder.Entity("TraineeManagement.Models.Review", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("Feedback")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("MentorId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ReviewStatus")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("ReviewedDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("Score")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SubmissionId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Reviews");
-                });
-
-            modelBuilder.Entity("TraineeManagement.Models.Submission", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("SubmissionUrl")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("SubmittedDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("TaskAssignmentId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Submissions");
                 });
 
             modelBuilder.Entity("TraineeManagement.Models.TaskAssignment", b =>

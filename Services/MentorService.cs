@@ -2,6 +2,7 @@ using TraineeManagement.Models;
 using TraineeManagement.DTOs;
 using TraineeManagement.Data;
 using Microsoft.EntityFrameworkCore;
+using TraineeManagement.Exceptions;
 
 namespace TraineeManagement.Services;
 public class MentorService : IMentorService
@@ -44,13 +45,13 @@ public class MentorService : IMentorService
 
         return new PagedResponse<MentorResponse>(pagedData, totalRecords, mentorSearchParameters.PageNumber, mentorSearchParameters.PageSize);
     }
-    public async Task<MentorResponse?> GetById(int Id)
+    public async Task<MentorResponse> GetById(int Id)
     {
         Mentor? Mentor = await _context.Mentors.FindAsync(Id);
         if(Mentor == null)
         {
             _logger.LogWarning("Record not found. Resource: {ResourceType}, Identifier: {Identifier}", "Mentor", Id);
-            return null;
+            throw new NotFoundException($"Mentor not found with Id: {Id}");
         }
         return new MentorResponse(Mentor);
     }
@@ -64,13 +65,13 @@ public class MentorService : IMentorService
         return new MentorResponse(Mentor);
     }
 
-    public async Task<MentorResponse?> Update(int Id, UpdateMentorRequest updateMentorRequest)
+    public async Task<MentorResponse> Update(int Id, UpdateMentorRequest updateMentorRequest)
     {
         Mentor? Mentor = await _context.Mentors.FindAsync(Id);
         if(Mentor == null)
         {
             _logger.LogWarning("Record not found. Resource: {ResourceType}, Identifier: {Identifier}", "Mentor", Id);
-            return null;
+            throw new NotFoundException($"Mentor not found with Id: {Id}");
         }
         Mentor.FirstName = updateMentorRequest.FirstName;
         Mentor.LastName = updateMentorRequest.LastName;
