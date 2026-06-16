@@ -4,6 +4,7 @@ using TraineeManagement.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using TraineeManagement.Exceptions;
+using Mysqlx;
 
 namespace TraineeManagement.Services;
 public class TraineeService : ITraineeService
@@ -80,8 +81,8 @@ public class TraineeService : ITraineeService
         trainee.TechStack = updateTraineeRequest.TechStack;
         trainee.Status = updateTraineeRequest.Status;
         DateTime dt = DateTime.Now;
-        DateTime date = new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second);
-        trainee.UpdatedDate = date;
+        dt = new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second);
+        trainee.UpdatedDate = dt;
         await _context.SaveChangesAsync();
         _logger.LogInformation("Trainee event: {ActionEvent} occurred for TraineeId: {TraineeId}", "Updated", trainee.Id);
         return new TraineeResponse(trainee);
@@ -93,7 +94,7 @@ public class TraineeService : ITraineeService
         if(trainee == null)
         {
             _logger.LogWarning("Record not found. Resource: {ResourceType}, Identifier: {Identifier}", "Trainee", Id);
-            return false;
+            throw new NotFoundException($"Trainee not found with Id: {Id}");
         }
         _context.Trainees.Remove(trainee);
         await _context.SaveChangesAsync();
