@@ -1,11 +1,8 @@
 using TraineeManagement.Models;
 using TraineeManagement.DTOs;
 using TraineeManagement.Data;
+using TraineeManagement.Exceptions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity;
-using Org.BouncyCastle.Asn1.Cms;
-using YamlDotNet.Core.Tokens;
 
 namespace TraineeManagement.Services;
 
@@ -24,20 +21,20 @@ public class AuthService : IAuthService
         _logger = logger;
     }
 
-    public async Task<LoginResponse?> Login(LoginRequest loginRequest)
+    public async Task<LoginResponse> Login(LoginRequest loginRequest)
     {
         User? user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == loginRequest.UserName);
         if(user == null)
         {
             _logger.LogWarning("Record not found. Resource: {ResourceType}, Username: {Identifier}", "Trainee", loginRequest.UserName);
-            return null;
+            throw new UnauthorizedException("Invalid Username or password");
         }
 
         bool isValidPassword = PasswordHasherService.VerifyPassword(loginRequest.Password, user.PasswordHash);
         if(!isValidPassword)
         {
             _logger.LogWarning("Password is Incorrect. Resource: {ResourceType}, Username: {Identifier}", "Trainee", loginRequest.UserName);
-            return null;
+            throw new UnauthorizedException("Invalid Username or password");
         }
 
         var token = _jwtService.GenerateToken(user.Id, user.UserName, user.Role);

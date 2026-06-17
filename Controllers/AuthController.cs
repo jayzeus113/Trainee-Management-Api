@@ -13,10 +13,10 @@ public class AuthController : ControllerBase
         _authService = authService;
     }
     
-    [HttpPost(Name = "/login")]
+    [HttpPost("login")]
     public async Task<IActionResult> Login(LoginRequest loginRequest)
     {
-        LoginResponse? loginResponse = await  _authService.Login(loginRequest);
-        return loginResponse == null ? Unauthorized("Username or Password is Incorrect!") : Ok(loginResponse);
+        LoginResponse loginResponse = await  _authService.Login(loginRequest);
+        return Ok(loginResponse);
     }
 }

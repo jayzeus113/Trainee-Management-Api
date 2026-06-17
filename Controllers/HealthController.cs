@@ -5,7 +5,7 @@ namespace TraineeManagement.Controllers;
 [Route("/api/[controller]")]
 public class HealthCheckController : ControllerBase
 {
-    [HttpGet(Name = "GetHealth")]
+    [HttpGet]
     public IActionResult Get()
     {
         return Ok(
