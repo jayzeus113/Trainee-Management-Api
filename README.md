@@ -2,8 +2,8 @@
 ---
 
 # Tech Stack
-- C#
-- .NET
+- C# 14
+- .NET 10
 
 ## How To Run
 
