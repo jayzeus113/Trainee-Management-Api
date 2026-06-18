@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using TraineeManagement.DTOs;
+using TraineeManagement.Extensions;
 
 namespace TraineeManagement.Models;
 
@@ -22,10 +23,8 @@ public class Mentor
         Email=createMentorRequest.Email;
         Expertise=createMentorRequest.Expertise;
         Status=createMentorRequest.Status;
-        DateTime dt = DateTime.Now;
-        DateTime date = new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second);
-        CreatedDate = date;
-        UpdatedDate = date;
+        CreatedDate = DateTime.UtcNow.ToUtcSecondPrecision();
+        UpdatedDate = DateTime.UtcNow.ToUtcSecondPrecision();
     }
 
     Mentor(){ }

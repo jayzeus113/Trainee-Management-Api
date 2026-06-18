@@ -1,4 +1,4 @@
-// Generic wrapper for returning paged data
+namespace TraineeManagement.DTOs;
 public class PagedResponse<T>
 {
     public IEnumerable<T> Data { get; set; }

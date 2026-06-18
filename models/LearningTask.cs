@@ -1,4 +1,6 @@
 using TraineeManagement.DTOs;
+using TraineeManagement.Extensions;
+
 namespace TraineeManagement.Models;
 
 public class LearningTask
@@ -24,10 +26,8 @@ public class LearningTask
         ExpectedTechStack = createLearningTaskRequest.ExpectedTechStack;
         DueDate = createLearningTaskRequest.DueDate;
         Status = createLearningTaskRequest.Status;
-        DateTime dt = new DateTime();
-        dt = new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second);
-        CreatedDate = dt;
-        UpdatedDate = dt;
+        CreatedDate = DateTime.UtcNow.ToUtcSecondPrecision();
+        UpdatedDate = DateTime.UtcNow.ToUtcSecondPrecision();
     }
     LearningTask() {}
 }

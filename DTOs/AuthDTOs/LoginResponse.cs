@@ -5,9 +5,9 @@ namespace TraineeManagement.DTOs;
 
 public class LoginResponse
 {
-    public string Token {get; set;} = string.Empty;
+    public string Token {get; set;} = "";
 
     public int ExpiresIn {get; set;}
 
-    public UserResponse User {get; set;} = null!; 
+    public UserResponse User {get; set;} = null!;
 }

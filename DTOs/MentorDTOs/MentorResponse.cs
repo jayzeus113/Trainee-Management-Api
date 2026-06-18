@@ -5,11 +5,11 @@ namespace TraineeManagement.DTOs;
 public class MentorResponse
 {
     public long Id {get; set;}
-    public string FirstName { get; set; } = string.Empty;
-    public string LastName { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
-    public string Expertise { get; set; } = string.Empty;
-    public string Status { get; set; } = string.Empty;
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string Email { get; set; }
+    public string Expertise { get; set; }
+    public string Status { get; set; }
 
     public DateTime CreatedDate {get; set;}
 
@@ -26,6 +26,4 @@ public class MentorResponse
         CreatedDate = m.CreatedDate;
         UpdatedDate = m.UpdatedDate;
     }
-
-    public MentorResponse(){}
 }

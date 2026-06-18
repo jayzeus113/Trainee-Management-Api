@@ -5,11 +5,11 @@ namespace TraineeManagement.DTOs;
 public class TraineeResponse
 {
     public long Id {get; set;}
-    public string FirstName { get; set; } = string.Empty;
-    public string LastName { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
-    public string TechStack { get; set; } = string.Empty;
-    public string Status { get; set; } = string.Empty;
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string Email { get; set; }
+    public string TechStack { get; set; }
+    public string Status { get; set; }
 
     public DateTime CreatedDate {get; set;}
 
@@ -26,6 +26,4 @@ public class TraineeResponse
         CreatedDate = t.CreatedDate;
         UpdatedDate = t.UpdatedDate;
     }
-
-    public TraineeResponse(){}
 }

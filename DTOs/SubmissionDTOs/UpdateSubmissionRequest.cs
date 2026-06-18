@@ -19,7 +19,7 @@ public class UpdateSubmissionRequest
     [Required]
     public DateTime SubmittedDate {get; set;}
 
-     [Required]
-     [AllowedValues("Submitted", "Resubmitted", ErrorMessage = "Invalid Status Value")]
-     public string Status {get; set;} = "";
+    [Required]
+    [AllowedValues("Submitted", "Resubmitted", ErrorMessage = "Invalid Status Value")]
+    public string Status {get; set;} = "";
 }
