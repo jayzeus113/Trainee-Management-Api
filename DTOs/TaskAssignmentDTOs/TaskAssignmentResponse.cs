@@ -4,6 +4,7 @@ namespace TraineeManagement.DTOs;
 
 public class TaskAssignmentResponse
 {
+    public int Id {get; set;}
     public int TraineeId {get; set;}
 
     public int MentorId {get; set;}
@@ -18,6 +19,7 @@ public class TaskAssignmentResponse
 
     public TaskAssignmentResponse(TaskAssignment ta)
     {
+        Id = ta.Id;
         TraineeId = ta.TraineeId;
         MentorId = ta.MentorId;
         LearningTaskId = ta.LearningTaskId;

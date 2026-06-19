@@ -11,8 +11,8 @@ using TraineeManagement.Data;
 namespace TraineeManagement.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260612102515_addLearningTasks")]
-    partial class addLearningTasks
+    [Migration("20260619095207_initialMigration")]
+    partial class initialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -93,6 +93,139 @@ namespace TraineeManagement.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Mentors");
+                });
+
+            modelBuilder.Entity("TraineeManagement.Models.Review", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Feedback")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("MentorId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReviewStatus")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("ReviewedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("Score")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SubmissionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Reviews");
+                });
+
+            modelBuilder.Entity("TraineeManagement.Models.Submission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("SubmissionUrl")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("SubmittedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("TaskAssignmentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Submissions");
+                });
+
+            modelBuilder.Entity("TraineeManagement.Models.SubmissionFile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("CheckSum")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("GeneratedStorageName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("OriginalFileName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<long>("Size")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("SubmissionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UploadedBy")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SubmissionFiles");
+                });
+
+            modelBuilder.Entity("TraineeManagement.Models.TaskAssignment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("AssigenedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("LearningTaskId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MentorId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Remarks")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("TraineeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TaskAssignments");
                 });
 
             modelBuilder.Entity("TraineeManagement.Models.Trainee", b =>

@@ -18,6 +18,7 @@ public class CreateMentorRequest
     public string Email {get; set;} = string.Empty;
 
     [Required]
+    [MaxLength(300)]
     public string Expertise {get; set;} = string.Empty;
     
     [Required]

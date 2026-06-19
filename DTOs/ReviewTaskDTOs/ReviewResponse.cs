@@ -4,14 +4,12 @@ namespace TraineeManagement.DTOs;
 
 public class ReviewResponse
 {
-
+    public int Id {get; set;}
     public int SubmissionId {get; set;}
     
     public int MentorId {get; set;}
     
-    
     public string Feedback {get; set;}
-    
     
     public int Score {get; set;}
 
@@ -19,13 +17,14 @@ public class ReviewResponse
     public string ReviewStatus {get; set;}
 
     public DateTime ReviewedDate {get; set;}
-    public ReviewResponse(Review s)
+    public ReviewResponse(Review r)
     {
-        SubmissionId = s.SubmissionId;
-        MentorId = s.MentorId;
-        Feedback = s.Feedback;
-        Score = s.Score;
-        ReviewStatus = s.ReviewStatus;
-        ReviewedDate = s.ReviewedDate;
+        Id = r.Id;
+        SubmissionId = r.SubmissionId;
+        MentorId = r.MentorId;
+        Feedback = r.Feedback;
+        Score = r.Score;
+        ReviewStatus = r.ReviewStatus;
+        ReviewedDate = r.ReviewedDate;
     }
 }

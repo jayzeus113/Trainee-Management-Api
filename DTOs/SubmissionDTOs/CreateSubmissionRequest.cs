@@ -12,6 +12,7 @@ public class CreateSubmissionRequest
     public string SubmissionUrl {get; set;} = "";
 
     [Required]
+    [MaxLength(400)]
     public string Notes {get; set;} = "";
 
     [Required]

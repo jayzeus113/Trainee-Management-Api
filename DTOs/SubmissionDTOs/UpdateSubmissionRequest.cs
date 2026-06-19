@@ -13,7 +13,7 @@ public class UpdateSubmissionRequest
     public string SubmissionUrl {get; set;} = "";
 
     [Required]
-    [MaxLength(100)]
+    [MaxLength(400)]
     public string Notes {get; set;} = "";
 
     [Required]

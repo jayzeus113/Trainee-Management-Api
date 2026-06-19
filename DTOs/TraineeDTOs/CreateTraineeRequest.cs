@@ -15,9 +15,11 @@ public class CreateTraineeRequest
 
     [Required]
     [EmailAddress]
+    [MaxLength(254)]
     public string Email {get; set;} = string.Empty;
 
     [Required]
+    [MaxLength(300)]
     public string TechStack {get; set;} = string.Empty;
     
     [Required]

@@ -152,6 +152,45 @@ namespace TraineeManagement.Migrations
                     b.ToTable("Submissions");
                 });
 
+            modelBuilder.Entity("TraineeManagement.Models.SubmissionFile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("CheckSum")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("GeneratedStorageName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("OriginalFileName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<long>("Size")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("SubmissionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UploadedBy")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SubmissionFiles");
+                });
+
             modelBuilder.Entity("TraineeManagement.Models.TaskAssignment", b =>
                 {
                     b.Property<int>("Id")

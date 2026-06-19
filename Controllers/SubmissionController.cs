@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using TraineeManagement.Services;
 using TraineeManagement.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 namespace TraineeManagement.Controllers;
 
 [Authorize]
@@ -36,5 +37,13 @@ public class SubmissionController : ControllerBase
     {
         SubmissionResponse submissionResponse = await _submissionService.Create(createSubmissionRequest);
         return Created("api/submissions", submissionResponse);
+    }
+
+     [HttpPost("{SubmissionId:int}/files")]
+    public async Task<IActionResult> UploadFile([FromRoute] int SubmissionId, [FromForm] CreateSubmissionFileRequest createSubmissionFileRequest )
+    {
+        // int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        SubmissionFileResponse submissionFileResponse = await _submissionService.UploadFile(1, SubmissionId, createSubmissionFileRequest);
+        return Created($"/api/submissions/{SubmissionId}/files", submissionFileResponse);
     }
 }

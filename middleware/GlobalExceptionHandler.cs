@@ -23,7 +23,7 @@ public class GlobalExceptionHandler : IExceptionHandler
             BadRequestException => (StatusCodes.Status400BadRequest, "Bad Request"),
             NotFoundException => (StatusCodes.Status404NotFound, "Not Found"),
             UnauthorizedException => (StatusCodes.Status401Unauthorized, "Unauthorized"),
-            _ => (StatusCodes.Status500InternalServerError, "Internal Server Error")
+            // _ => (StatusCodes.Status500InternalServerError, "Internal Server Error")
         };
 
         httpContext.Response.StatusCode = statusCode;

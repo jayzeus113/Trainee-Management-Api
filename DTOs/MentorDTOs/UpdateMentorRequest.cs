@@ -17,6 +17,7 @@ public class UpdateMentorRequest
     public string Email {get; set;} = "";
 
     [Required]
+    [MaxLength(300)]
     public string Expertise {get; set;} = "";
     
     [Required]
