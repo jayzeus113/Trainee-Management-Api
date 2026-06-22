@@ -18,6 +18,7 @@ builder.Services.AddScoped<ITaskAssignmentService, TaskAssignmentService>();
 builder.Services.AddScoped<ISubmissionService, SubmissionService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
+builder.Services.AddScoped<RedisCacheSercvice>();
 
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -69,6 +70,12 @@ builder.Services.AddSwaggerGen(opt =>
     {
         [new OpenApiSecuritySchemeReference("Bearer", document)] = []
     });
+});
+
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+    options.InstanceName = "MyWebApiCache_"; // Optional prefix for keys
 });
 
 

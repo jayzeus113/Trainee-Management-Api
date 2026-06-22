@@ -24,7 +24,7 @@ public class LearningTask
         Title = createLearningTaskRequest.Title;
         Description = createLearningTaskRequest.Description;
         ExpectedTechStack = createLearningTaskRequest.ExpectedTechStack;
-        DueDate = createLearningTaskRequest.DueDate;
+        DueDate = createLearningTaskRequest.DueDate.ToUtcSecondPrecision();
         Status = createLearningTaskRequest.Status;
         CreatedDate = DateTime.UtcNow.ToUtcSecondPrecision();
         UpdatedDate = DateTime.UtcNow.ToUtcSecondPrecision();

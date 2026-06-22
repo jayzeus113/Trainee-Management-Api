@@ -5,18 +5,23 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using TraineeManagement.Exceptions;
 using Mysqlx;
+using Microsoft.Extensions.Caching.Distributed;
+using System.Text.Json;
 
 namespace TraineeManagement.Services;
 public class TraineeService : ITraineeService
 {
     private readonly AppDbContext _context;
     private readonly ILogger<TraineeService> _logger;
+    private readonly RedisCacheSercvice _redisCacheSercvice;
 
-    public TraineeService(AppDbContext context, ILogger<TraineeService> logger)
+    public TraineeService(AppDbContext context, ILogger<TraineeService> logger, RedisCacheSercvice redisCacheSercvice)
     {
         _context = context;
         _logger = logger;
+        _redisCacheSercvice = redisCacheSercvice;
     }
+    
 
     public async Task<PagedResponse<TraineeResponse>> GetAll(TraineeSearchParameters traineeSearchParameters)
     {
@@ -49,13 +54,27 @@ public class TraineeService : ITraineeService
     }
     public async Task<TraineeResponse> GetById(int Id)
     {
+        string cacheKey = $"trainee:{Id}";
+
+        TraineeResponse? cachedTraineeResponse = await _redisCacheSercvice.GetKeyAsync<TraineeResponse>(cacheKey);
+
+        if(cachedTraineeResponse != default) {
+            _logger.LogInformation("Cache hit, Found the Trainee with Id: {Id}", Id);
+            return cachedTraineeResponse;
+        }
         Trainee? trainee = await _context.Trainees.FindAsync(Id);
+
         if(trainee == null)
         {
             _logger.LogWarning("Record not found. Resource: {ResourceType}, Identifier: {Identifier}", "Trainee", Id);
             throw new NotFoundException($"Trainee not found with Id: {Id}");
         }
-        return new TraineeResponse(trainee);
+
+        TraineeResponse traineeResponse = new TraineeResponse(trainee);
+
+        await _redisCacheSercvice.SetKeyAsync(cacheKey, traineeResponse);
+
+        return traineeResponse;
     }
 
     public async Task<TraineeResponse> Create(CreateTraineeRequest createTraineeRequest)
@@ -85,7 +104,12 @@ public class TraineeService : ITraineeService
         trainee.UpdatedDate = dt;
         await _context.SaveChangesAsync();
         _logger.LogInformation("Trainee event: {ActionEvent} occurred for TraineeId: {TraineeId}", "Updated", trainee.Id);
-        return new TraineeResponse(trainee);
+
+        string cacheKey = $"trainee:{Id}";
+        TraineeResponse traineeResponse = new TraineeResponse(trainee);
+        
+        await _redisCacheSercvice.SetKeyAsync(cacheKey, traineeResponse);
+        return traineeResponse;
     }
 
     public async Task<bool> Delete(int Id)
@@ -99,6 +123,10 @@ public class TraineeService : ITraineeService
         _context.Trainees.Remove(trainee);
         await _context.SaveChangesAsync();
         _logger.LogInformation("Trainee event: {ActionEvent} occurred for TraineeId: {TraineeId}", "Updated", Id);
+
+        string cacheKey = $"trainee:{Id}";
+        bool cacheKeyExists = await _redisCacheSercvice.ExistsKeyAsync(cacheKey);
+        if(cacheKeyExists)  await _redisCacheSercvice.DeleteKeyAsync(cacheKey);
         return true;
     }
 }

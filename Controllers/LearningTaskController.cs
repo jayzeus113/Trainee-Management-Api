@@ -34,7 +34,8 @@ public class LearningTaskController : ControllerBase
     public async Task<IActionResult> Create(CreateLearningTaskRequest createLearningTaskRequest)
     {
         LearningTaskResponse learningTaskResponse = await _learningTaskService.Create(createLearningTaskRequest);
-        return Created("api/learning-tasks", learningTaskResponse);
+        // return Created("api/learning-tasks", learningTaskResponse);
+        return CreatedAtAction(nameof(GetById), new { id = learningTaskResponse.Id }, learningTaskResponse);
     }
 
     [HttpPut("{Id:int}")]

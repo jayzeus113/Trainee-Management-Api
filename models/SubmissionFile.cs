@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using TraineeManagement.DTOs;
 
 namespace TraineeManagement.Models;
 

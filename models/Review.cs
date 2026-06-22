@@ -1,4 +1,5 @@
 using TraineeManagement.DTOs;
+using TraineeManagement.Extensions;
 namespace TraineeManagement.Models;
 public class Review
 {
@@ -22,7 +23,7 @@ public class Review
         Feedback = createReview.Feedback;
         Score = createReview.Score;
         ReviewStatus = createReview.ReviewStatus;
-        ReviewedDate = createReview.ReviewedDate;
+        ReviewedDate = createReview.ReviewedDate.ToUtcSecondPrecision();
     }
     Review() {}
 }

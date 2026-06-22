@@ -1,13 +1,9 @@
-
-
-
 using TraineeManagement.Models;
 using TraineeManagement.DTOs;
 using Microsoft.EntityFrameworkCore;
 using TraineeManagement.Data;
 using TraineeManagement.Exceptions;
 using TraineeManagement.Extensions;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace TraineeManagement.Services;
  
@@ -16,14 +12,16 @@ public class SubmissionService : ISubmissionService
     private readonly AppDbContext _context;
     private readonly ILogger<SubmissionService> _logger;
     private readonly IFileStorageService _fileStorageService;
+    private readonly RedisCacheSercvice _redisCacheSercvice;
+
  
  
- 
-    public SubmissionService(AppDbContext context, ILogger<SubmissionService> logger, IFileStorageService fileStorageService)
+    public SubmissionService(AppDbContext context, ILogger<SubmissionService> logger, IFileStorageService fileStorageService, RedisCacheSercvice redisCacheSercvice)
     {
         _logger = logger;
         _context = context;
         _fileStorageService = fileStorageService;
+        _redisCacheSercvice = redisCacheSercvice;
     }
    
  
@@ -34,13 +32,24 @@ public class SubmissionService : ISubmissionService
  
     public async Task<SubmissionResponse> GetById(int Id)
     {
+        string cacheKey = $"submission:{Id}";
+
+        SubmissionResponse? cachedSubmissionResponse = await _redisCacheSercvice.GetKeyAsync<SubmissionResponse>(cacheKey);
+
+        if(cachedSubmissionResponse != default) {
+            _logger.LogInformation("Cache hit, Found the Submission with Id: {Id}", Id);
+            return cachedSubmissionResponse;
+        }
+
         Submission? submission = await _context.Submissions.FindAsync(Id);
         if(submission == null)
         {
             _logger.LogInformation("Submission not found with {Id}", Id);
             throw new NotFoundException($"Submission not found with Id: {Id}");
         }
-        return new SubmissionResponse(submission);
+        SubmissionResponse submissionResponse = new SubmissionResponse(submission);
+        await _redisCacheSercvice.SetKeyAsync(cacheKey, submissionResponse);
+        return submissionResponse;
     }
  
     public async Task<SubmissionResponse> Create(CreateSubmissionRequest createSubmissionRequest)
@@ -108,6 +117,5 @@ public class SubmissionService : ISubmissionService
         await _context.SaveChangesAsync();
         return true;
     }
- 
 }
  

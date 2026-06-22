@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TraineeManagement.Data;
 using TraineeManagement.DTOs;
 using TraineeManagement.Models;
+using TraineeManagement.Extensions;
 
 namespace TraineeManagement.Services;
 
@@ -77,11 +78,9 @@ public class LearningTaskService : ILearningTaskService
         learningTask.Title = updateLearningTask.Title;
         learningTask.Description = updateLearningTask.Description;
         learningTask.ExpectedTechStack = updateLearningTask.ExpectedTechStack;
-        learningTask.DueDate = updateLearningTask.DueDate;
+        learningTask.DueDate = updateLearningTask.DueDate.ToUtcSecondPrecision();
         learningTask.Status = updateLearningTask.Status;
-        DateTime dt = DateTime.Now;
-        dt = new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second);
-        learningTask.UpdatedDate = dt;
+        learningTask.UpdatedDate = DateTime.UtcNow.ToUtcSecondPrecision();
         await _context.SaveChangesAsync();
         _logger.LogInformation("LearningTask event: {ActionEvent} occurred for LearningTaskId: {MentorId}", "Updated", learningTask.Id);
         return new LearningTaskResponse(learningTask);

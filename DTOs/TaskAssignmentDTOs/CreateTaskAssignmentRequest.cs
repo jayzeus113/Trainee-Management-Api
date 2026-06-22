@@ -5,13 +5,15 @@ namespace TraineeManagement.DTOs;
 
 public class CreateTaskAssignmentRequest
 {
-    [Required]
+    
+    [Range(1, int.MaxValue, ErrorMessage = "Invalid TraineeId")]
     public int TraineeId {get; set;}
 
-    [Required]
+    
+    [Range(1, int.MaxValue, ErrorMessage = "Invalid MentorId")]
     public int MentorId {get; set;}
 
-    [Required]
+    [Range(1, int.MaxValue, ErrorMessage = "Invalid LearningTaskId")]
     public int LearningTaskId {get; set;}
 
     [Required]

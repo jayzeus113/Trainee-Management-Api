@@ -7,10 +7,9 @@ public class CreateSubmissionFileRequest
 {
     [Required(ErrorMessage = "File is required.")]
     [MaxFileSize(5 * 1024 * 1024)] // 5 MB max
-    [AllowedExtensions([".jpg", ".jpeg", ".png", ".pdf"])]
+    [AllowedExtensions([".jpg", ".jpeg", ".png", ".pdf", ".txt"])]
     public IFormFile File { get; set; } = null!;
- 
-    [Required(ErrorMessage = "UploadedBy is required.")]
+    [Range(1, int.MaxValue, ErrorMessage = "Invalid UploadedBy Id")]
     public int UploadedBy { get; set; }
  
 }

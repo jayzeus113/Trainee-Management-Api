@@ -1,3 +1,4 @@
+using TraineeManagement.Extensions;
 using TraineeManagement.Models;
 
 namespace TraineeManagement.DTOs;

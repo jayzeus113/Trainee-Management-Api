@@ -4,17 +4,18 @@ System.ComponentModel.DataAnnotations;
 namespace TraineeManagement.DTOs;
 
 public class UpdateReviewRequest
-{
-    [Required]
+{ 
+    [Range(1, int.MaxValue, ErrorMessage = "Invalid SubmissionId")]
     public int SubmissionId {get; set;}
-    [Required]
+    
+    
+    [Range(1, int.MaxValue, ErrorMessage = "Invalid MentorId")]
     public int MentorId {get; set;}
     
     [Required]
     [MaxLength(100)]
     public string Feedback {get; set;} = "";
     
-    [Required]
     public int Score {get; set;}
 
     [Required]

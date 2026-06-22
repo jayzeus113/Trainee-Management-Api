@@ -9,11 +9,13 @@ public class TaskAssignmentService : ITaskAssignmentService
 {
     private readonly AppDbContext _context;
     private readonly ILogger<TaskAssignmentService> _logger;
+    private readonly RedisCacheSercvice _redisCacheSercvice;
 
-    public TaskAssignmentService(AppDbContext context, ILogger<TaskAssignmentService> logger)
+    public TaskAssignmentService(AppDbContext context, ILogger<TaskAssignmentService> logger, RedisCacheSercvice redisCacheSercvice)
     {
         _context = context;
         _logger = logger;
+        _redisCacheSercvice = redisCacheSercvice;
     }
 
     public async Task<List<TaskAssignmentResponse>> GetAll()
@@ -22,13 +24,24 @@ public class TaskAssignmentService : ITaskAssignmentService
     }
     public async Task<TaskAssignmentResponse> GetById(int Id)
     {
+        string cacheKey = $"taskAssignment:{Id}";
+
+        TaskAssignmentResponse? cachedTaskAssignmentResponse = await _redisCacheSercvice.GetKeyAsync<TaskAssignmentResponse>(cacheKey);
+
+        if(cachedTaskAssignmentResponse != default) {
+            _logger.LogInformation("Cache hit, Found the TaskAssignmentResponse with Id: {Id}", Id);
+            return cachedTaskAssignmentResponse;
+        }
+
         TaskAssignment? taskAssignment = await _context.TaskAssignments.FindAsync(Id);
         if(taskAssignment == null)
         {
             _logger.LogWarning("Record not found. Resource: {ResourceType}, Identifier: {Identifier}", "Task Assignment", Id);
             throw new NotFoundException($"Task Assignment not found with Id: {Id}");
         }
-        return new TaskAssignmentResponse(taskAssignment);
+        TaskAssignmentResponse taskAssignmentResponse = new TaskAssignmentResponse(taskAssignment);
+        await _redisCacheSercvice.SetKeyAsync(cacheKey, taskAssignmentResponse);
+        return taskAssignmentResponse;
     }
 
     public async Task<TaskAssignmentResponse> Create(CreateTaskAssignmentRequest createTaskAssignmentRequest)
@@ -68,6 +81,9 @@ public class TaskAssignmentService : ITaskAssignmentService
         taskAssignment.Status = updateTaskAssignmentRequest.Status;
         await _context.SaveChangesAsync();
         _logger.LogInformation("Task Assignment event: {ActionEvent} occurred for TaskAssignmentId: {TaskAssignmentId}", "Updated", taskAssignment.Id);
-        return new TaskAssignmentResponse(taskAssignment);
+        string cacheKey = $"taskAssignment:{Id}";
+        TaskAssignmentResponse taskAssignmentResponse = new(taskAssignment);
+        await _redisCacheSercvice.SetKeyAsync(cacheKey, taskAssignmentResponse);
+        return taskAssignmentResponse;
     }
 }

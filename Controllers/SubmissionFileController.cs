@@ -37,7 +37,7 @@ public class SubmissionsController : ControllerBase
     [HttpDelete("{SubmissionId:int}")]
     public async Task<IActionResult> DeleteFile(int SubmissionId)
     {
-        bool isDeleted = await _submissionService.DeleteFile(SubmissionId);
+        await _submissionService.DeleteFile(SubmissionId);
         return NoContent();
     }
 }

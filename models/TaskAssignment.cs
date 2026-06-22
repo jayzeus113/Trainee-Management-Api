@@ -1,4 +1,5 @@
 using TraineeManagement.DTOs;
+using TraineeManagement.Extensions;
 namespace TraineeManagement.Models;
 public class TaskAssignment
 {
@@ -21,8 +22,8 @@ public class TaskAssignment
         TraineeId = createTaskAssignment.TraineeId;
         MentorId = createTaskAssignment.MentorId;
         LearningTaskId = createTaskAssignment.LearningTaskId;
-        AssigenedDate = createTaskAssignment.AssigenedDate;
-        DueDate = createTaskAssignment.DueDate;
+        AssigenedDate = createTaskAssignment.AssigenedDate.ToUtcSecondPrecision();
+        DueDate = createTaskAssignment.DueDate.ToUtcSecondPrecision();
         Status = createTaskAssignment.Status;
         Remarks = createTaskAssignment.Remarks;
     }

@@ -5,7 +5,7 @@ namespace TraineeManagement.DTOs;
 
 public class UpdateSubmissionRequest
 {
-    [Required]
+    [Range(1, int.MaxValue, ErrorMessage = "Invalid TaskAssignment Id")]
     public int TaskAssignmentId {get; set;}
 
     [Required]
