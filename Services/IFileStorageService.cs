@@ -11,5 +11,5 @@ public interface IFileStorageService
 
     string GetContentType(string fileName);
 
-    string GetChecksum(string fileName);
+    string GetChecksum(Stream stream);
 }

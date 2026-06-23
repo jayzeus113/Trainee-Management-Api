@@ -13,15 +13,17 @@ public class SubmissionService : ISubmissionService
     private readonly ILogger<SubmissionService> _logger;
     private readonly IFileStorageService _fileStorageService;
     private readonly RedisCacheSercvice _redisCacheSercvice;
+    private readonly IMessagePublisher _messagePublisher;
 
  
- 
-    public SubmissionService(AppDbContext context, ILogger<SubmissionService> logger, IFileStorageService fileStorageService, RedisCacheSercvice redisCacheSercvice)
+    public SubmissionService(AppDbContext context, ILogger<SubmissionService> logger, IFileStorageService fileStorageService, RedisCacheSercvice redisCacheSercvice, IMessagePublisher messagePublisher)
     {
         _logger = logger;
         _context = context;
         _fileStorageService = fileStorageService;
         _redisCacheSercvice = redisCacheSercvice;
+        _messagePublisher = messagePublisher;
+        
     }
    
  
@@ -68,14 +70,17 @@ public class SubmissionService : ISubmissionService
     {
         bool submission = await _context.Submissions.AnyAsync(s => s.Id == submissionId);
         if(!submission) throw new NotFoundException($"TaskAssignment not found with Id: {submissionId}");
+        
+        var correlationId = Guid.NewGuid();
  
         IFormFile file = createSubmissionFileRequest.File;
         string generatedFileName = _fileStorageService.GenerateUniqueFileName(file.FileName);
         string contentType = _fileStorageService.GetContentType(generatedFileName);
+        Stream stream = file.OpenReadStream();
         string? userName = await _context.Users.Where(u => u.Id == userId).Select(u => u.UserName).FirstOrDefaultAsync();
-        await _fileStorageService.SaveAsync(generatedFileName, file.OpenReadStream());
-        string CheckSum = _fileStorageService.GetChecksum(generatedFileName);
-        SubmissionFile submissionFile = new SubmissionFile
+        await _fileStorageService.SaveAsync(generatedFileName, stream);
+        string CheckSum = _fileStorageService.GetChecksum(stream);
+        SubmissionFile submissionFile = new()
         {
             SubmissionId = submissionId,
             OriginalFileName = file.FileName,
@@ -88,6 +93,23 @@ public class SubmissionService : ISubmissionService
         };
         await _context.SubmissionFiles.AddAsync(submissionFile);
         await _context.SaveChangesAsync();
+
+        // try
+        // {
+            var message = new SubmissionProcessingRequested(
+                MessageId: Guid.NewGuid(),
+                CorrelationId: correlationId,
+                SubmissionId: Guid.NewGuid(),
+                FileId: submissionFile.Id,
+                RequestedAt: DateTime.UtcNow.ToUtcSecondPrecision()
+            );
+
+            await _messagePublisher.PublishAsync(message);
+            
+        // } catch(Exception)
+        // {
+        //     throw new ServiceUnavailableException("Database update completed, but background processing pipeline is temporarily offline.");
+        // }
  
         return new SubmissionFileResponse
         {

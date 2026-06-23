@@ -20,6 +20,7 @@ builder.Services.AddScoped<ISubmissionService, SubmissionService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
 builder.Services.AddScoped<RedisCacheSercvice>();
+builder.Services.AddSingleton<IMessagePublisher, RabbitMqPublisher>();
 
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -53,6 +54,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddAuthorization();
+
 builder.Host.UseSerilog((context, configuration) => configuration.ReadFrom.Configuration(context.Configuration));
 
 builder.Services.AddSwaggerGen(opt =>
@@ -92,7 +94,7 @@ builder.Services.AddCors(options =>
         });
 });
 
-// builder.Logging.ClearProviders();
+builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
  
 

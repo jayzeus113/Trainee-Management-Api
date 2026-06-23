@@ -75,15 +75,9 @@ public class LocalFileStorageService : IFileStorageService
         return contentType;
     }
  
-    public string GetChecksum(string fileName)
+    public string GetChecksum(Stream stream)
     {
-        string filePath = GetFullPath(fileName);
- 
-        if (!File.Exists(filePath))
-            throw new FileNotFoundException("File not found.", filePath);
- 
         using var sha256 = SHA256.Create();
-        using var stream = File.OpenRead(filePath);
         byte[] hashBytes = sha256.ComputeHash(stream);
         return Convert.ToHexString(hashBytes).ToLowerInvariant();
     }

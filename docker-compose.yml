@@ -26,17 +26,28 @@ services:
   rabbitmq:
     image: docker-registry-002.zeuslearning.com/zeuslearning/rabbitmq
     container_name: rabbitmq_server
-    hostname: my-rabbitmq
+    restart: always
     ports:
-      - "5672:5672"  
-      - "15672:15672" 
+      - "${RABBITMQ_SERVER_PORT}:5672"
+      - "${RABBITMQ_MANAGEMENT_PLUGIN_PORT}:15672"
     environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    configs:
+      - source: rabbitmq-plugins
+        target: /etc/rabbitmq/enabled_plugins
     volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
+      - rabbitmq_lib:/var/lib/rabbitmq
+      - rabbitmq_log:/var/log/rabbitmq
+
+configs:
+  rabbitmq-plugins:
+    content: "[rabbitmq_management]."
 
 volumes:
   mysql_data:
   redis_data:
-  rabbitmq_data:
+  rabbitmq_lib:
+    driver: local
+  rabbitmq_log:
+    driver: local

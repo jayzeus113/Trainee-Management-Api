@@ -44,6 +44,6 @@ public class SubmissionController : ControllerBase
     {
         // int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         SubmissionFileResponse submissionFileResponse = await _submissionService.UploadFile(1, SubmissionId, createSubmissionFileRequest);
-        return Created($"/api/submissions/{SubmissionId}/files", submissionFileResponse);
+        return Accepted($"/api/submissions/{SubmissionId}/files", submissionFileResponse);
     }
 }
