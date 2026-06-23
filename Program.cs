@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi;
+using Serilog;
 
 
 
@@ -52,6 +53,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddAuthorization();
+builder.Host.UseSerilog((context, configuration) => configuration.ReadFrom.Configuration(context.Configuration));
 
 builder.Services.AddSwaggerGen(opt =>
 {
@@ -90,18 +92,20 @@ builder.Services.AddCors(options =>
         });
 });
 
-builder.Logging.ClearProviders();
+// builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
  
 
 var app = builder.Build();
 app.UseExceptionHandler(); 
+app.UseSerilogRequestLogging(); 
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 
 app.UseRouting();
 app.UseCors();

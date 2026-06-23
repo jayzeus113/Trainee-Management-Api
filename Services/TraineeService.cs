@@ -54,6 +54,7 @@ public class TraineeService : ITraineeService
     }
     public async Task<TraineeResponse> GetById(int Id)
     {
+        _logger.LogInformation("Fetching trainee from the /api/trainees/{id} endpoint at {Time}", Id, DateTime.UtcNow);
         string cacheKey = $"trainee:{Id}";
 
         TraineeResponse? cachedTraineeResponse = await _redisCacheSercvice.GetKeyAsync<TraineeResponse>(cacheKey);
