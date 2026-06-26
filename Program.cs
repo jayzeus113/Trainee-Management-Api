@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi;
 using Serilog;
+using RabbitMQ.Client;
 
 
 
@@ -19,8 +20,9 @@ builder.Services.AddScoped<ITaskAssignmentService, TaskAssignmentService>();
 builder.Services.AddScoped<ISubmissionService, SubmissionService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
-builder.Services.AddScoped<RedisCacheSercvice>();
+builder.Services.AddScoped<RedisCacheService>();
 builder.Services.AddSingleton<IMessagePublisher, RabbitMqPublisher>();
+builder.Services.AddScoped<IProcessingJobService, ProcessingJobService>();
 
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -33,6 +35,15 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseMySQL(connectionString));
+
+builder.Services.AddHealthChecks()
+    .AddRabbitMQ(name:"RabbitMQ")
+    .AddRedis(
+        redisConnectionString: builder.Configuration.GetConnectionString("Redis")!,
+        name: "Redis")
+    .AddMySql(
+        connectionString: builder.Configuration.GetConnectionString("DefaultConnection")!,
+        name: "MySQL");
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = Encoding.UTF8.GetBytes(jwtSettings["Key"]!);
@@ -54,8 +65,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddAuthorization();
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File(
+        path: "logs/myapp-.txt",
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 31,
+        shared: true
+    )
+    .CreateLogger();
 
-builder.Host.UseSerilog((context, configuration) => configuration.ReadFrom.Configuration(context.Configuration));
+builder.Services.AddSerilog();
 
 builder.Services.AddSwaggerGen(opt =>
 {
@@ -79,9 +99,21 @@ builder.Services.AddSwaggerGen(opt =>
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = builder.Configuration.GetConnectionString("Redis");
-    options.InstanceName = "MyWebApiCache_"; // Optional prefix for keys
+    options.InstanceName = "MyWebApiCache_";
 });
 
+var rabbitSection = builder.Configuration.GetSection("RabbitMQ");
+
+var factory = new ConnectionFactory
+{
+    HostName = rabbitSection["HostName"]!,
+    Port = int.Parse(rabbitSection["Port"] ?? "5672"),
+    UserName = rabbitSection["UserName"]!,
+    Password = rabbitSection["Password"]!
+};
+
+var connection = await factory.CreateConnectionAsync();
+builder.Services.AddSingleton(connection);
 
 
 var  MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -96,7 +128,6 @@ builder.Services.AddCors(options =>
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
- 
 
 var app = builder.Build();
 app.UseExceptionHandler(); 

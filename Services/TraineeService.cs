@@ -2,24 +2,20 @@ using TraineeManagement.Models;
 using TraineeManagement.DTOs;
 using TraineeManagement.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
 using TraineeManagement.Exceptions;
-using Mysqlx;
-using Microsoft.Extensions.Caching.Distributed;
-using System.Text.Json;
 
 namespace TraineeManagement.Services;
 public class TraineeService : ITraineeService
 {
     private readonly AppDbContext _context;
     private readonly ILogger<TraineeService> _logger;
-    private readonly RedisCacheSercvice _redisCacheSercvice;
+    private readonly RedisCacheService _redisCacheService;
 
-    public TraineeService(AppDbContext context, ILogger<TraineeService> logger, RedisCacheSercvice redisCacheSercvice)
+    public TraineeService(AppDbContext context, ILogger<TraineeService> logger, RedisCacheService redisCacheService)
     {
         _context = context;
         _logger = logger;
-        _redisCacheSercvice = redisCacheSercvice;
+        _redisCacheService = redisCacheService;
     }
     
 
@@ -54,10 +50,12 @@ public class TraineeService : ITraineeService
     }
     public async Task<TraineeResponse> GetById(int Id)
     {
+        // await Task.Delay(5000);
+        // throw new Exception("Error");
         _logger.LogInformation("Fetching trainee from the /api/trainees/{id} endpoint at {Time}", Id, DateTime.UtcNow);
         string cacheKey = $"trainee:{Id}";
 
-        TraineeResponse? cachedTraineeResponse = await _redisCacheSercvice.GetKeyAsync<TraineeResponse>(cacheKey);
+        TraineeResponse? cachedTraineeResponse = await _redisCacheService.GetKeyAsync<TraineeResponse>(cacheKey);
 
         if(cachedTraineeResponse != default) {
             _logger.LogInformation("Cache hit, Found the Trainee with Id: {Id}", Id);
@@ -73,8 +71,8 @@ public class TraineeService : ITraineeService
 
         TraineeResponse traineeResponse = new TraineeResponse(trainee);
 
-        await _redisCacheSercvice.SetKeyAsync(cacheKey, traineeResponse);
-
+        await _redisCacheService.SetKeyAsync(cacheKey, traineeResponse);
+        _logger.LogDebug("Populating Redis cache key: {CacheKey} with Trainee data.", cacheKey);
         return traineeResponse;
     }
 
@@ -109,7 +107,8 @@ public class TraineeService : ITraineeService
         string cacheKey = $"trainee:{Id}";
         TraineeResponse traineeResponse = new TraineeResponse(trainee);
         
-        await _redisCacheSercvice.SetKeyAsync(cacheKey, traineeResponse);
+        await _redisCacheService.SetKeyAsync(cacheKey, traineeResponse);
+        _logger.LogDebug("Updating Redis cache key: {CacheKey} with Trainee data.", cacheKey);
         return traineeResponse;
     }
 
@@ -123,11 +122,11 @@ public class TraineeService : ITraineeService
         }
         _context.Trainees.Remove(trainee);
         await _context.SaveChangesAsync();
-        _logger.LogInformation("Trainee event: {ActionEvent} occurred for TraineeId: {TraineeId}", "Updated", Id);
+        _logger.LogInformation("Trainee event: {ActionEvent} occurred for TraineeId: {TraineeId}", "Deleted", Id);
 
         string cacheKey = $"trainee:{Id}";
-        bool cacheKeyExists = await _redisCacheSercvice.ExistsKeyAsync(cacheKey);
-        if(cacheKeyExists)  await _redisCacheSercvice.DeleteKeyAsync(cacheKey);
+        bool cacheKeyExists = await _redisCacheService.ExistsKeyAsync(cacheKey);
+        if(cacheKeyExists)  await _redisCacheService.DeleteKeyAsync(cacheKey);
         return true;
     }
 }

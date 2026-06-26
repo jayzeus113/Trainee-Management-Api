@@ -14,41 +14,45 @@ public interface IMessagePublisher
 
 public class RabbitMqPublisher : IMessagePublisher
 {
-    private readonly ConnectionFactory _factory;
+    private readonly IConnection _connection;
     private readonly ILogger<RabbitMqPublisher> _logger;
     private const string QueueName = "submission-processing";
+    private const string DlxName = "submission-dlx";
+    private const string DlqRoutingKey = "submission-failed";
 
-    public RabbitMqPublisher(IConfiguration configuration, ILogger<RabbitMqPublisher> logger)
+    public RabbitMqPublisher(IConnection connection, ILogger<RabbitMqPublisher> logger)
     {
         _logger = logger;
-        _factory = new ConnectionFactory
-        {
-            HostName = configuration["RabbitMQ:HostName"]!,
-            Port = int.Parse(configuration["RabbitMQ:Port"] ?? "5672"),
-            UserName = configuration["RabbitMQ:UserName"]!,
-            Password = configuration["RabbitMQ:Password"]!
-        };
+        _connection = connection;
     }
 
     public async Task PublishAsync(SubmissionProcessingRequested message)
     {
+        _logger.LogDebug("Preparing payload tracking context. MsgID: {MessageId}. Payload: {PayloadJson}", message.MessageId, JsonSerializer.Serialize(message));
+
         try
         {
-            await using var connection = await _factory.CreateConnectionAsync();
-            await using var channel = await connection.CreateChannelAsync();
+            await using var channel = await _connection.CreateChannelAsync();
 
-            // Setup durable queue
+            var queueArguments = new Dictionary<string, object?>
+            {
+                { "x-dead-letter-exchange", DlxName },
+                { "x-dead-letter-routing-key", DlqRoutingKey }
+            };
+
+
             await channel.QueueDeclareAsync(
                 queue: QueueName,
                 durable: true,
                 exclusive: false,
                 autoDelete: false,
-                arguments: null);
+                arguments: queueArguments);
+
 
             var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message));
             var properties = new BasicProperties
             {
-                DeliveryMode = DeliveryModes.Persistent // Surivives broker crash
+                DeliveryMode = DeliveryModes.Persistent
             };
 
             await channel.BasicPublishAsync(
@@ -67,8 +71,7 @@ public class RabbitMqPublisher : IMessagePublisher
             _logger.LogError(ex, 
                 "Failed to publish message to RabbitMQ. MsgID: {MessageId}, CorrID: {CorrelationId}. Broker might be unavailable.",
                 message.MessageId, message.CorrelationId);
-            
-            // Re-throw so controller does not commit a false 202 status
+                
             throw new InvalidOperationException("Messaging subsystem unavailable. Cannot queue work.", ex);
         }
     }

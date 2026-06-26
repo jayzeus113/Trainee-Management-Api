@@ -9,13 +9,13 @@ public class TaskAssignmentService : ITaskAssignmentService
 {
     private readonly AppDbContext _context;
     private readonly ILogger<TaskAssignmentService> _logger;
-    private readonly RedisCacheSercvice _redisCacheSercvice;
+    private readonly RedisCacheService _RedisCacheService;
 
-    public TaskAssignmentService(AppDbContext context, ILogger<TaskAssignmentService> logger, RedisCacheSercvice redisCacheSercvice)
+    public TaskAssignmentService(AppDbContext context, ILogger<TaskAssignmentService> logger, RedisCacheService RedisCacheService)
     {
         _context = context;
         _logger = logger;
-        _redisCacheSercvice = redisCacheSercvice;
+        _RedisCacheService = RedisCacheService;
     }
 
     public async Task<List<TaskAssignmentResponse>> GetAll()
@@ -26,7 +26,7 @@ public class TaskAssignmentService : ITaskAssignmentService
     {
         string cacheKey = $"taskAssignment:{Id}";
 
-        TaskAssignmentResponse? cachedTaskAssignmentResponse = await _redisCacheSercvice.GetKeyAsync<TaskAssignmentResponse>(cacheKey);
+        TaskAssignmentResponse? cachedTaskAssignmentResponse = await _RedisCacheService.GetKeyAsync<TaskAssignmentResponse>(cacheKey);
 
         if(cachedTaskAssignmentResponse != default) {
             _logger.LogInformation("Cache hit, Found the TaskAssignmentResponse with Id: {Id}", Id);
@@ -40,7 +40,8 @@ public class TaskAssignmentService : ITaskAssignmentService
             throw new NotFoundException($"Task Assignment not found with Id: {Id}");
         }
         TaskAssignmentResponse taskAssignmentResponse = new TaskAssignmentResponse(taskAssignment);
-        await _redisCacheSercvice.SetKeyAsync(cacheKey, taskAssignmentResponse);
+        await _RedisCacheService.SetKeyAsync(cacheKey, taskAssignmentResponse);
+        _logger.LogDebug("Populating Redis cache key: {CacheKey} with Task Assignment data.", cacheKey);
         return taskAssignmentResponse;
     }
 
@@ -49,17 +50,26 @@ public class TaskAssignmentService : ITaskAssignmentService
         bool traineeExists = await _context.Trainees.AnyAsync(t => t.Id == createTaskAssignmentRequest.TraineeId);
 
         if(!traineeExists)
-        throw new NotFoundException($"Trainee not found with Id: {createTaskAssignmentRequest.TraineeId}");
+        {
+            _logger.LogWarning("Record not found. Resource: {ResourceType}, Identifier: {Identifier}", "Trainee", createTaskAssignmentRequest.TraineeId);
+            throw new NotFoundException($"Trainee not found with Id: {createTaskAssignmentRequest.TraineeId}");
+        }
 
         bool mentorExists = await _context.Mentors.AnyAsync(m => m.Id == createTaskAssignmentRequest.MentorId);
 
         if(!mentorExists)
-        throw new NotFoundException($"Mentor not found with Id: {createTaskAssignmentRequest.MentorId}");
+        {
+            _logger.LogWarning("Record not found. Resource: {ResourceType}, Identifier: {Identifier}", "Mentor", createTaskAssignmentRequest.MentorId);
+            throw new NotFoundException($"Mentor not found with Id: {createTaskAssignmentRequest.MentorId}");
+        }
 
         bool learningTaskExists = await _context.LearningTasks.AnyAsync(lt => lt.Id == createTaskAssignmentRequest.LearningTaskId);
         
         if(!learningTaskExists)
-        throw new NotFoundException($"Learning Task not found with Id: {createTaskAssignmentRequest.LearningTaskId}");
+        {
+            _logger.LogWarning("Record not found. Resource: {ResourceType}, Identifier: {Identifier}", "Learning Task", createTaskAssignmentRequest.LearningTaskId);
+            throw new NotFoundException($"Learning Task not found with Id: {createTaskAssignmentRequest.LearningTaskId}");
+        }
 
         if(createTaskAssignmentRequest.DueDate < createTaskAssignmentRequest.AssigenedDate) throw new BadRequestException("DueDate should be after AssignedDate");
 
@@ -83,7 +93,8 @@ public class TaskAssignmentService : ITaskAssignmentService
         _logger.LogInformation("Task Assignment event: {ActionEvent} occurred for TaskAssignmentId: {TaskAssignmentId}", "Updated", taskAssignment.Id);
         string cacheKey = $"taskAssignment:{Id}";
         TaskAssignmentResponse taskAssignmentResponse = new(taskAssignment);
-        await _redisCacheSercvice.SetKeyAsync(cacheKey, taskAssignmentResponse);
+        await _RedisCacheService.SetKeyAsync(cacheKey, taskAssignmentResponse);
+        _logger.LogDebug("Updating Redis cache key: {CacheKey} with Task Assignment data.", cacheKey);
         return taskAssignmentResponse;
     }
 }

@@ -36,12 +36,18 @@ public class ReviewService : IReviewService
         bool submissionExists = await _context.Submissions.AnyAsync(s => s.Id == createReviewRequest.SubmissionId);
 
         if(!submissionExists)
-        throw new NotFoundException($"Submission not found with Id: {createReviewRequest.SubmissionId}");
+        {
+            _logger.LogWarning("Record not found. Resource: {ResourceType}, Identifier: {Identifier}", "Mentor", createReviewRequest.SubmissionId);
+            throw new NotFoundException($"Submission not found with Id: {createReviewRequest.SubmissionId}");
+        }
 
         bool mentorExists = await _context.Mentors.AnyAsync(m => m.Id == createReviewRequest.MentorId);
 
         if(!mentorExists)
-        throw new NotFoundException($"Mentor not found with Id: {createReviewRequest.MentorId}");
+        {
+            _logger.LogWarning("Record not found. Resource: {ResourceType}, Identifier: {Identifier}", "Mentor", createReviewRequest.MentorId);
+            throw new NotFoundException($"Mentor not found with Id: {createReviewRequest.MentorId}");
+        }
 
         Review review = new Review(createReviewRequest);
         await _context.Reviews.AddAsync(review);
