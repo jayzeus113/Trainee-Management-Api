@@ -7,10 +7,12 @@ public class UpdateTraineeRequest
 {
     [Required]
     [MaxLength(50)]
+    [RegularExpression(@"^[a-zA-Z\s\-']+$", ErrorMessage = "Last name can only contain letters, spaces, hyphens, and apostrophes.")]
     public string FirstName {get; set;} = null!;
 
     [Required]
     [MaxLength(50)]
+    [RegularExpression(@"^[a-zA-Z\s\-']+$", ErrorMessage = "Last name can only contain letters, spaces, hyphens, and apostrophes.")]
     public string LastName {get; set;} = null!;
 
     [Required]
