@@ -4,6 +4,7 @@ using TraineeManagement.Data;
 using TraineeManagement.DTOs;
 using TraineeManagement.Models;
 using TraineeManagement.Extensions;
+using TraineeManagement.Exceptions;
 
 namespace TraineeManagement.Services;
 
@@ -61,6 +62,10 @@ public class LearningTaskService : ILearningTaskService
 
     public async Task<LearningTaskResponse> Create(CreateLearningTaskRequest createLearningTaskRequest)
     {
+        if(createLearningTaskRequest.DueDate < DateTime.UtcNow)
+        {
+            throw new BadRequestException("Due Date should be greater than current date");
+        }
         LearningTask learningTask = new LearningTask(createLearningTaskRequest);
         await _context.LearningTasks.AddAsync(learningTask);
         await _context.SaveChangesAsync();
@@ -74,6 +79,12 @@ public class LearningTaskService : ILearningTaskService
         {
             _logger.LogWarning("Record not found. Resource: {ResourceType}, Identifier: {Identifier}", "Learning Task", Id);
             return null;
+        }
+
+        
+        if(updateLearningTask.DueDate < DateTime.UtcNow)
+        {
+            throw new BadRequestException("Due Date should be greater than current date");
         }
         learningTask.Title = updateLearningTask.Title;
         learningTask.Description = updateLearningTask.Description;

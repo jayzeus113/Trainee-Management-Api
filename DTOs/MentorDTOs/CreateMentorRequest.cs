@@ -1,5 +1,5 @@
-using
-System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+using TraineeManagement.Constants;
 
 namespace TraineeManagement.DTOs;
 
@@ -7,21 +7,22 @@ public class CreateMentorRequest
 {
     [Required]
     [MaxLength(50)]
-    public string FirstName {get; set;} = string.Empty;
+    public string FirstName {get; set;} = null!;
 
     [Required]
     [MaxLength(50)]
-    public string LastName {get; set;} = string.Empty;
+    public string LastName {get; set;} = null!;
 
     [Required]
     [EmailAddress]
-    public string Email {get; set;} = string.Empty;
+    [MaxLength(500)]
+    public string Email {get; set;} = null!;
 
     [Required]
     [MaxLength(300)]
-    public string Expertise {get; set;} = string.Empty;
+    public string Expertise {get; set;} = null!;
     
     [Required]
-    [AllowedValues(["Active", "Inactive"], ErrorMessage="Invalid status value")]
-    public string Status {get; set;} = string.Empty;
+    [AllowedValues([StringConstants.STATUS_ACTIVE, StringConstants.STATUS_INACTIVE], ErrorMessage="Invalid status value")]
+    public string Status {get; set;} = null!;
 }

@@ -1,13 +1,13 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Http;
+using TraineeManagement.Constants;
  
 namespace TraineeManagement.DTOs;
 
 public class CreateSubmissionFileRequest
 {
-    [Required(ErrorMessage = "File is required.")]
-    [MaxFileSize(5 * 1024 * 1024)] // 5 MB max
-    [AllowedExtensions([".jpg", ".jpeg", ".png", ".pdf", ".txt"])]
+    [Required]
+    [MaxFileSize(5 * NumberConstants.KB * NumberConstants.KB)]
+    [AllowedExtensions([".jpg", ".jpeg", ".png", ".pdf"])]
     public IFormFile File { get; set; } = null!;
     [Range(1, int.MaxValue, ErrorMessage = "Invalid UploadedBy Id")]
     public int UploadedBy { get; set; }
@@ -28,14 +28,13 @@ public class MaxFileSizeAttribute : ValidationAttribute
         {
             if (file.Length > _maxFileSize)
             {
-                return new ValidationResult(ErrorMessage ?? $"Maximum allowed file size is {_maxFileSize / (1024 * 1024)} MB.");
+                return new ValidationResult(ErrorMessage ?? $"Maximum allowed file size is {_maxFileSize / (NumberConstants.KB * NumberConstants.KB)} MB.");
             }
         }
         return ValidationResult.Success;
     }
 }
 
-// 2. Custom Allowed Extensions Attribute
 public class AllowedExtensionsAttribute : ValidationAttribute
 {
     private readonly string[] _extensions;

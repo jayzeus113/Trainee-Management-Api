@@ -12,7 +12,6 @@ public class ReviewResponse
     public string Feedback {get; set;}
     
     public int Score {get; set;}
-
     
     public string ReviewStatus {get; set;}
 

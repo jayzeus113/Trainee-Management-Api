@@ -1,28 +1,29 @@
 using
 System.ComponentModel.DataAnnotations;
 
+using TraineeManagement.Constants;
+
 namespace TraineeManagement.DTOs;
 
 public class CreateTraineeRequest
 {
     [Required]
     [MaxLength(50)]
-    public string FirstName {get; set;} = string.Empty;
+    public string FirstName {get; set;} = null!;
 
     [Required]
     [MaxLength(50)]
-    public string LastName {get; set;} = string.Empty;
+    public string LastName {get; set;} = null!;
 
     [Required]
     [EmailAddress]
-    [MaxLength(254)]
-    public string Email {get; set;} = string.Empty;
+    public string Email {get; set;} = null!;
 
     [Required]
     [MaxLength(300)]
-    public string TechStack {get; set;} = string.Empty;
+    public string TechStack {get; set;} = null!;
     
     [Required]
-    [AllowedValues(["Active", "Inactive", "Completed"], ErrorMessage="Invalid status value")]
-    public string Status {get; set;} = string.Empty;
+    [AllowedValues([StringConstants.STATUS_ACTIVE, StringConstants.STATUS_INACTIVE, StringConstants.STATUS_COMPLETED], ErrorMessage="Invalid status value")]
+    public string Status {get; set;} = null!;
 }

@@ -5,6 +5,6 @@ public record SubmissionProcessingRequested(
     Guid CorrelationId,
     int SubmissionId,
     int FileId,
-    DateTimeOffset RequestedAt,
+    DateTime RequestedAt,
     string ContractVersion = "1.0"
 );

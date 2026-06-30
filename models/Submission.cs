@@ -1,17 +1,25 @@
+using System.ComponentModel.DataAnnotations;
 using TraineeManagement.DTOs;
 using TraineeManagement.Extensions;
 namespace TraineeManagement.Models;
 public class Submission
 {
+    [Key]
     public int Id {get; set;}
-
+    [Required]
     public int TaskAssignmentId {get; set;}
-    public string SubmissionUrl {get; set;} = "";
-    public string Notes {get; set;} = "";
+    [Required]
+    [MaxLength(200)]
+    public string SubmissionUrl {get; set;} = null!;
+    [Required]
+    [MaxLength(400)]
+    public string Notes {get; set;} = null!;
 
+    [Required]
     public DateTime SubmittedDate {get; set;}
 
-    public string Status {get; set;} = "";
+    [Required]
+    public string Status {get; set;} = null!;
 
     public Submission(CreateSubmissionRequest createSubmissionRequest)
     {

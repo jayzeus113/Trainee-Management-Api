@@ -14,7 +14,7 @@ public class LocalFileStorageService : IFileStorageService
     public LocalFileStorageService(IConfiguration configuration, ILogger<LocalFileStorageService> logger)
     {
         _logger = logger;
-        _basePath = configuration["FileStorageSettings:BasePath"] ?? "../TraineeManagement/Uploads";
+        _basePath = configuration["LocalFileStorage:BasePath"] ?? "./Uploads";
         _logger.LogInformation("Initializing LocalFileStorageService with BasePath: {BasePath}", _basePath);
         Directory.CreateDirectory(_basePath);
     }

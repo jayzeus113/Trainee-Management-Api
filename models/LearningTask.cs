@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using TraineeManagement.DTOs;
 using TraineeManagement.Extensions;
 
@@ -5,19 +6,28 @@ namespace TraineeManagement.Models;
 
 public class LearningTask
 {
+    [Key]
     public int Id {get; set;}
+    
+    [Required]
+    public string Title {get; set;} = null!;
 
-    public string Title {get; set;} = "";
+    [Required]
+    public string Description {get; set;} = null!;
+    
+    [Required]
+    public string ExpectedTechStack {get; set;} = null!;
 
-    public string Description {get; set;} = "";
-
-    public string ExpectedTechStack {get; set;} = "";
-
+    [Required]
     public DateTime DueDate {get; set;}
 
-    public string Status {get; set;} = string.Empty;
+    [Required]
+    public string Status {get; set;} = null!;
 
+    [Required]
     public DateTime CreatedDate {get; set;}
+
+    [Required]
     public DateTime UpdatedDate {get; set;}
 
     public LearningTask(CreateLearningTaskRequest createLearningTaskRequest) {
